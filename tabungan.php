@@ -1,17 +1,14 @@
 <?php
 require_once 'config/koneksi.php';
 
-// Data Target Tabungan
 $query_tabungan = "SELECT * FROM tabungan ORDER BY tanggal_dibuat DESC";
 $result_tabungan = mysqli_query($koneksi, $query_tabungan);
 
-// Persiapan data untuk Chart.js
 $chart_labels = [];
 $chart_data_terkumpul = [];
 $chart_data_target = [];
 
-// Loop untuk mengambil data dari hasil query
-mysqli_data_seek($result_tabungan, 0); // Pastikan pointer kembali ke awal
+mysqli_data_seek($result_tabungan, 0); 
 while ($row = mysqli_fetch_assoc($result_tabungan)) {
     $chart_labels[] = $row['nama_tujuan'];
     $chart_data_terkumpul[] = $row['jumlah_terkumpul'];
@@ -22,8 +19,6 @@ $chart_labels_json = json_encode($chart_labels);
 $chart_data_terkumpul_json = json_encode($chart_data_terkumpul);
 $chart_data_target_json = json_encode($chart_data_target);
 
-
-// Set halaman saat ini untuk menandai link header yang aktif
 $currentPage = 'tabungan';
 ?>
 <!DOCTYPE html>
@@ -51,7 +46,7 @@ $currentPage = 'tabungan';
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php mysqli_data_seek($result_tabungan, 0); // Reset pointer lagi untuk loop kedua
+            <?php mysqli_data_seek($result_tabungan, 0);
             while ($tabungan = mysqli_fetch_assoc($result_tabungan)): 
                 $persentase = ($tabungan['target_jumlah'] > 0) ? ($tabungan['jumlah_terkumpul'] / $tabungan['target_jumlah']) * 100 : 0;
             ?>

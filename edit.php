@@ -1,7 +1,6 @@
 <?php
 require_once 'config/koneksi.php';
 
-// Cek apakah ada ID di URL
 if (!isset($_GET['id'])) {
     header('Location: index.php');
     exit();
@@ -9,7 +8,6 @@ if (!isset($_GET['id'])) {
 
 $id = $_GET['id'];
 
-// Ambil data transaksi yang akan diedit
 $query_transaksi = "SELECT * FROM transaksi WHERE id = ?";
 $stmt = mysqli_prepare($koneksi, $query_transaksi);
 mysqli_stmt_bind_param($stmt, "i", $id);
@@ -22,11 +20,9 @@ if (!$transaksi) {
     exit();
 }
 
-// Ambil semua data kategori untuk dropdown
 $query_kategori = "SELECT * FROM kategori ORDER BY nama_kategori ASC";
 $result_kategori = mysqli_query($koneksi, $query_kategori);
 
-// Kode Tampilan (di-copy dari file index.php dan disederhanakan)
 ?>
 <!DOCTYPE html>
 <html lang="id">

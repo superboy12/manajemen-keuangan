@@ -1,17 +1,12 @@
 <?php
 require_once 'config/koneksi.php';
 
-// --- LOGIKA PERSIAPAN DATA ---
-
-// 1. Ambil Rata-rata Pemasukan Bulanan (dari 6 bulan terakhir untuk data lebih stabil)
 $avg_income_query = "SELECT AVG(total) as rata_pemasukan FROM (SELECT SUM(jumlah) as total FROM transaksi WHERE jenis = 'pemasukan' AND tanggal >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY YEAR(tanggal), MONTH(tanggal)) as bulanan";
 $rata_pemasukan = mysqli_fetch_assoc(mysqli_query($koneksi, $avg_income_query))['rata_pemasukan'] ?? 0;
 
-// 2. Ambil Rata-rata Pengeluaran Rutin (Non-Utang & Non-Tabungan)
 $avg_expense_query = "SELECT AVG(total) as rata_pengeluaran FROM (SELECT SUM(jumlah) as total FROM transaksi t JOIN kategori k ON t.id_kategori = k.id WHERE t.jenis = 'pengeluaran' AND k.nama_kategori NOT IN ('Tabungan', 'Utang') AND t.tanggal >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY YEAR(t.tanggal), MONTH(t.tanggal)) as bulanan";
 $rata_pengeluaran_rutin = mysqli_fetch_assoc(mysqli_query($koneksi, $avg_expense_query))['rata_pengeluaran'] ?? 0;
 
-// 3. Ambil Semua Data Utang
 $utang_query = "SELECT * FROM utang WHERE sisa_utang > 0";
 $result_utang = mysqli_query($koneksi, $utang_query);
 
@@ -24,11 +19,9 @@ while ($row = mysqli_fetch_assoc($result_utang)) {
     $total_cicilan_minimum += $row['cicilan_minimum'];
 }
 
-// --- LOGIKA KALKULATOR PROYEKSI ---
-$persen_alokasi = isset($_POST['alokasi']) ? (float)$_POST['alokasi'] : 15; // Default 15%
+$persen_alokasi = isset($_POST['alokasi']) ? (float)$_POST['alokasi'] : 15;
 $dana_alokasi_utang = ($persen_alokasi / 100) * $rata_pemasukan;
 
-// Dana pembayaran tidak boleh lebih kecil dari total cicilan minimum
 if ($dana_alokasi_utang < $total_cicilan_minimum) {
     $dana_alokasi_utang = $total_cicilan_minimum;
 }

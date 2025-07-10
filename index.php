@@ -1,27 +1,21 @@
 <?php
 require_once 'config/koneksi.php';
 
-// --- Ambil semua data yang dibutuhkan ---
-
-// Data Kategori untuk dropdown
 $query_kategori = "SELECT * FROM kategori ORDER BY nama_kategori ASC";
 $result_kategori = mysqli_query($koneksi, $query_kategori);
 
-// Data Ringkasan (saldo, dll)
 $query_pemasukan = "SELECT SUM(jumlah) as total FROM transaksi WHERE jenis = 'pemasukan'";
 $total_pemasukan = mysqli_fetch_assoc(mysqli_query($koneksi, $query_pemasukan))['total'] ?? 0;
 $query_pengeluaran = "SELECT SUM(jumlah) as total FROM transaksi WHERE jenis = 'pengeluaran'";
 $total_pengeluaran = mysqli_fetch_assoc(mysqli_query($koneksi, $query_pengeluaran))['total'] ?? 0;
 $saldo = $total_pemasukan - $total_pengeluaran;
 
-// Data Transaksi Terakhir
 $query_transaksi = "SELECT t.*, k.nama_kategori 
                     FROM transaksi t 
                     LEFT JOIN kategori k ON t.id_kategori = k.id 
                     ORDER BY t.tanggal DESC LIMIT 5";
 $result_transaksi = mysqli_query($koneksi, $query_transaksi);
 
-// Data untuk Grafik Alokasi Pengeluaran
 $query_chart = "SELECT k.nama_kategori, SUM(t.jumlah) as total_pengeluaran
                 FROM transaksi t
                 JOIN kategori k ON t.id_kategori = k.id
@@ -40,8 +34,6 @@ while ($row = mysqli_fetch_assoc($result_chart)) {
 $chart_labels_json = json_encode($chart_labels);
 $chart_data_json = json_encode($chart_data);
 
-
-// Fungsi untuk Saran & Peringatan Keuangan
 function getFinancialInsight($pemasukan, $pengeluaran) {
     if ($pemasukan <= 0) {
         return ['status' => 'netral', 'pesan' => 'Selamat datang! Mulai catat pemasukan dan pengeluaran Anda.'];
@@ -57,7 +49,6 @@ function getFinancialInsight($pemasukan, $pengeluaran) {
 }
 $insight = getFinancialInsight($total_pemasukan, $total_pengeluaran);
 
-// Set halaman saat ini untuk menandai link header yang aktif
 $currentPage = 'dashboard';
 ?>
 <!DOCTYPE html>

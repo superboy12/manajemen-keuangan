@@ -1,5 +1,4 @@
 <?php
-// Path diubah, tidak lagi menggunakan ../
 require_once 'config/koneksi.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
